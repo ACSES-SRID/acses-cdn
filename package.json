@@ -1,0 +1,15 @@
+{
+  "name": "acses-cdn",
+  "version": "1.0.0",
+  "description": "A node server to serve image files to the acses website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lawson Buabassah",
+  "license": "ISC",
+  "dependencies": {
+    "compression": "^1.7.5",
+    "express": "^4.21.2"
+  }
+}
