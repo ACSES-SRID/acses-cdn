@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
         <h1>Welcome to the Image Server</h1>
         <p>Access your images like this:</p>
         <ul>
-            <li><a href="/public/gallery/logo.jpg" target="_blank">Click here</a></li>
+            <li><a href="/gallery/logo.jpg" target="_blank">Click here</a></li>
         </ul>
     `);
 });
