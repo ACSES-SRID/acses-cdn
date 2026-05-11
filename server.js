@@ -2,9 +2,17 @@ const express = require('express');
 const path = require('path');
 const compression = require('compression');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
+
+// ── Security Headers ──────────────────────────────────
+// helmet sets secure HTTP headers (X-Content-Type-Options, etc.)
+// crossOriginResourcePolicy disabled so static images can be loaded cross-origin
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 
 // ── Global Middleware ──────────────────────────────────
 app.use(compression());
