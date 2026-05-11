@@ -12,6 +12,9 @@ Major restructuring and security overhaul. This is a breaking change from v1.x �
   - Login via `POST /api/auth/login` returns a JWT token (8h expiry)
   - All write routes require `Authorization: Bearer <token>` header
   - Replaces the old disconnected `ADMIN_PASSWORD` env var approach
+- **Request Logging** — `morgan` middleware added to `server.js` to log all API requests with status codes and response times to the terminal.
+- **API Documentation** — **Swagger UI** added at `/api-docs` using the new `config/swagger.json` OpenAPI spec.
+- **Enhanced Health Check** — `GET /health` now returns uptime and a localized timestamp.
 - **Password hashing** — all passwords are now bcrypt-hashed before storage in `routes/users.js`
   - `GET /api/users` no longer returns password fields (uses MongoDB projection)
   - Password updates are re-hashed automatically
