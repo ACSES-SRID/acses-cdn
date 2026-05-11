@@ -1,0 +1,1947 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "ACSES CDN & API",
+        "description": "REST API for the ACSES department website. Provides CRUD operations for website content management and serves static files.\n\n**Authentication:** All write operations (POST, PUT, DELETE) require a JWT token obtained from `/api/auth/login`. Pass it as `Authorization: Bearer <token>`.\n\n**Pagination:** Routes marked with pagination support accept `?page=1&limit=20` query parameters and return `{ items, total, page, limit }`.",
+        "version": "2.0.0",
+        "contact": {
+            "name": "ACSES SRID"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3002",
+            "description": "Local development"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "JWT token from POST /api/auth/login"
+            }
+        },
+        "schemas": {
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Failed to fetch events"
+                    }
+                }
+            },
+            "Success": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Updated successfully"
+                    }
+                }
+            },
+            "Created": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "665a1b2c3d4e5f6789012345"
+                    }
+                }
+            },
+            "LoginRequest": {
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "mypassword"
+                    }
+                }
+            },
+            "LoginResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "eyJhbGciOiJIUzI1NiIs..."
+                    },
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "_id": {
+                                "type": "string"
+                            },
+                            "username": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "role": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "Event": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Tech Week 2026"
+                    },
+                    "date": {
+                        "type": "string",
+                        "example": "2026-06-15"
+                    },
+                    "venue": {
+                        "type": "string",
+                        "example": "Main Auditorium"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "conference"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "upcoming"
+                    },
+                    "flyer": {
+                        "type": "string",
+                        "example": "https://example.com/flyer.jpg"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "EventInput": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string"
+                    },
+                    "venue": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "flyer": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Announcement": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Exam Timetable Released"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string"
+                    },
+                    "visibility": {
+                        "type": "string",
+                        "example": "public"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "published"
+                    },
+                    "author": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "AnnouncementInput": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "body": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string"
+                    },
+                    "visibility": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "author": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Leadership": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Dr. Jane Doe"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "HOD"
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "LeadershipInput": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "ResourcesGrouped": {
+                "type": "object",
+                "properties": {
+                    "academic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Resource"
+                        }
+                    },
+                    "tools": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Resource"
+                        }
+                    },
+                    "career": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Resource"
+                        }
+                    }
+                }
+            },
+            "Resource": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "academic",
+                            "tools",
+                            "career"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ResourceInput": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "academic",
+                            "tools",
+                            "career"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Product": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "ACSES T-Shirt"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number",
+                        "example": 45.00
+                    },
+                    "originalPrice": {
+                        "type": "number",
+                        "nullable": true,
+                        "example": 60.00
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "apparel"
+                    },
+                    "badge": {
+                        "type": "string",
+                        "example": "New"
+                    },
+                    "badgeColor": {
+                        "type": "string",
+                        "example": "#ff5722"
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProductInput": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number"
+                    },
+                    "originalPrice": {
+                        "type": "number"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "badge": {
+                        "type": "string"
+                    },
+                    "badgeColor": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GalleryItem": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "src": {
+                        "type": "string",
+                        "example": "https://cdn.acses.com/gallery/photo1.jpg"
+                    },
+                    "alt": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "events"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "GalleryInput": {
+                "type": "object",
+                "properties": {
+                    "src": {
+                        "type": "string"
+                    },
+                    "alt": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    }
+                }
+            },
+            "StudentProject": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Campus Navigator App"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "technologies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "React",
+                            "Node.js"
+                        ]
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "github": {
+                        "type": "string"
+                    },
+                    "demo": {
+                        "type": "string"
+                    },
+                    "video": {
+                        "type": "string"
+                    },
+                    "submittedBy": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "approved"
+                        ],
+                        "example": "pending"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "StudentProjectInput": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "technologies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "image": {
+                        "type": "string"
+                    },
+                    "github": {
+                        "type": "string"
+                    },
+                    "demo": {
+                        "type": "string"
+                    },
+                    "video": {
+                        "type": "string"
+                    },
+                    "submittedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "HomeContent": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "presidentMessage": {
+                        "type": "string"
+                    },
+                    "hodMessage": {
+                        "type": "string"
+                    },
+                    "statistics": {
+                        "type": "object"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "HomeInput": {
+                "type": "object",
+                "properties": {
+                    "presidentMessage": {
+                        "type": "string"
+                    },
+                    "hodMessage": {
+                        "type": "string"
+                    },
+                    "statistics": {
+                        "type": "object"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "description": "Password is never returned in responses."
+            },
+            "UserInput": {
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PaginatedEvents": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Event"
+                        }
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 45
+                    },
+                    "page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "example": 20
+                    }
+                }
+            },
+            "PaginatedGallery": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GalleryItem"
+                        }
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "limit": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "PaginatedProducts": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Product"
+                        }
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "limit": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "PaginatedProjects": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StudentProject"
+                        }
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "limit": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "parameters": {
+            "idParam": {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string"
+                },
+                "description": "MongoDB ObjectId"
+            },
+            "pageParam": {
+                "name": "page",
+                "in": "query",
+                "schema": {
+                    "type": "integer",
+                    "default": 1,
+                    "minimum": 1
+                },
+                "description": "Page number"
+            },
+            "limitParam": {
+                "name": "limit",
+                "in": "query",
+                "schema": {
+                    "type": "integer",
+                    "default": 50,
+                    "minimum": 1,
+                    "maximum": 100
+                },
+                "description": "Items per page"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Authentication"
+        },
+        {
+            "name": "Events",
+            "description": "Event management"
+        },
+        {
+            "name": "Announcements",
+            "description": "News & announcements"
+        },
+        {
+            "name": "Leadership",
+            "description": "Leadership/executive profiles"
+        },
+        {
+            "name": "Resources",
+            "description": "Academic, tools & career resources"
+        },
+        {
+            "name": "Store",
+            "description": "Product management"
+        },
+        {
+            "name": "Gallery",
+            "description": "Photo gallery"
+        },
+        {
+            "name": "Student Projects",
+            "description": "Student project showcase & submissions"
+        },
+        {
+            "name": "Home",
+            "description": "Home page content"
+        },
+        {
+            "name": "Users",
+            "description": "Admin user management"
+        },
+        {
+            "name": "Health",
+            "description": "Server status"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health check",
+                "description": "Returns server status. Use this to check if the server is running.",
+                "responses": {
+                    "200": {
+                        "description": "Server is healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "uptime": {
+                                            "type": "number",
+                                            "example": 3600.5
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Admin login",
+                "description": "Authenticate with username and password. Returns a JWT token valid for 8 hours. Rate limited to 10 attempts per 15 minutes.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing username or password"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "429": {
+                        "description": "Too many login attempts"
+                    }
+                }
+            }
+        },
+        "/api/events": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "List events",
+                "description": "Returns a paginated list of events, sorted by most recent first.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/pageParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated event list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedEvents"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Create event",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Event created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Created"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}": {
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Update event",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Success"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Delete event",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Success"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    }
+                }
+            }
+        },
+        "/api/announcements": {
+            "get": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "List announcements",
+                "responses": {
+                    "200": {
+                        "description": "Announcement list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Announcement"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Create announcement",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnnouncementInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Created"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    }
+                }
+            }
+        },
+        "/api/announcements/{id}": {
+            "put": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Update announcement",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AnnouncementInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Delete announcement",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/leadership": {
+            "get": {
+                "tags": [
+                    "Leadership"
+                ],
+                "summary": "List leadership members",
+                "description": "Sorted by `order` field then `createdAt`.",
+                "responses": {
+                    "200": {
+                        "description": "Leadership list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Leadership"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Leadership"
+                ],
+                "summary": "Add leadership member",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LeadershipInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Created"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/leadership/{id}": {
+            "put": {
+                "tags": [
+                    "Leadership"
+                ],
+                "summary": "Update leadership member",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LeadershipInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Leadership"
+                ],
+                "summary": "Delete leadership member",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/resources": {
+            "get": {
+                "tags": [
+                    "Resources"
+                ],
+                "summary": "List resources grouped by type",
+                "description": "Returns `{ academic: [...], tools: [...], career: [...] }`.",
+                "responses": {
+                    "200": {
+                        "description": "Grouped resources",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResourcesGrouped"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Resources"
+                ],
+                "summary": "Add resource",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResourceInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/resources/{id}": {
+            "put": {
+                "tags": [
+                    "Resources"
+                ],
+                "summary": "Update resource",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResourceInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Resources"
+                ],
+                "summary": "Delete resource",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/store": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "List products",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/pageParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated products",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedProducts"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Add product",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/store/{id}": {
+            "put": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Update product",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Delete product",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/gallery": {
+            "get": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "List gallery items",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/pageParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated gallery",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedGallery"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Add gallery item",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GalleryInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/gallery/{id}": {
+            "put": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Update gallery item",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GalleryInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Delete gallery item",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/student-projects": {
+            "get": {
+                "tags": [
+                    "Student Projects"
+                ],
+                "summary": "List approved projects",
+                "description": "Public endpoint. Only returns projects with `status: 'approved'`.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/pageParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated approved projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedProjects"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Student Projects"
+                ],
+                "summary": "Submit a project",
+                "description": "Public endpoint. Submitted projects default to `status: 'pending'` and require admin approval.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StudentProjectInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project submitted for review"
+                    }
+                }
+            }
+        },
+        "/api/student-projects/all": {
+            "get": {
+                "tags": [
+                    "Student Projects"
+                ],
+                "summary": "List all projects (admin)",
+                "description": "Returns all projects including pending. Admin can approve by updating `status` to `'approved'`.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/pageParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/limitParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedProjects"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/student-projects/{id}": {
+            "put": {
+                "tags": [
+                    "Student Projects"
+                ],
+                "summary": "Update/approve project",
+                "description": "Set `{ \"status\": \"approved\" }` to approve a pending project.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StudentProjectInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Student Projects"
+                ],
+                "summary": "Delete project",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/home": {
+            "get": {
+                "tags": [
+                    "Home"
+                ],
+                "summary": "Get home page content",
+                "description": "Returns the single home document with president message, HOD message, and statistics.",
+                "responses": {
+                    "200": {
+                        "description": "Home content",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HomeContent"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Home"
+                ],
+                "summary": "Update home page content",
+                "description": "Replaces the entire home document atomically.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HomeInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List admin users",
+                "description": "Passwords are never included in the response.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User list (no passwords)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create admin user",
+                "description": "Password is hashed with bcrypt before storage. Returns 409 if username already exists.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created"
+                    },
+                    "400": {
+                        "description": "Missing username/password"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    },
+                    "409": {
+                        "description": "Username already exists"
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update admin user",
+                "description": "If a new password is provided, it will be re-hashed.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete admin user",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        }
+    }
+}
