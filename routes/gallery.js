@@ -13,12 +13,20 @@ async function getCollection() {
     return client.db(DB_NAME).collection(COLLECTION);
 }
 
-// Public: list all gallery items
+// Public: list gallery items (supports optional pagination via ?page=1&limit=20)
 router.get('/', async (req, res) => {
     try {
         const col = await getCollection();
-        const items = await col.find({}).sort({ createdAt: -1 }).toArray();
-        res.json(items);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+        const skip = (page - 1) * limit;
+
+        const [items, total] = await Promise.all([
+            col.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).toArray(),
+            col.countDocuments()
+        ]);
+
+        res.json({ items, total, page, limit });
     } catch (err) {
         console.error(`GET /${COLLECTION}:`, err.message);
         res.status(500).json({ error: `Failed to fetch ${COLLECTION}` });
