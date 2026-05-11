@@ -4,12 +4,17 @@
   "description": "A node server to serve image files to the acses website",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Lawson Buabassah",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "compression": "^1.7.5",
-    "express": "^4.21.2"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0"
   }
 }
