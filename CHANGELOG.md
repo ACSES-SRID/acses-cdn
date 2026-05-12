@@ -2,6 +2,17 @@
 
 All notable changes to the ACSES CDN & API server are documented in this file.
 
+## [2.0.1] - 2026-05-12
+
+### ✨ New Features
+
+- **Local CORS Support**: Added `http://localhost:5173` to `CORS_ORIGIN` to allow local development with Vite.
+
+### 🛠️ Refactors
+
+- **Admin Seeding**: Updated `scripts/seed.js` to prioritize `ADMIN_USERNAME` and `ADMIN_PASSWORD` from environment variables.
+- **Credential Migration**: Migrated superadmin credentials to `.env` for improved security and environment-specific configuration.
+
 ## [2.0.0] - 2026-05-11
 
 Major restructuring and security overhaul. This is a breaking change from v1.x — the API now requires JWT authentication for all write operations and uses RESTful URL parameters for PUT/DELETE.
