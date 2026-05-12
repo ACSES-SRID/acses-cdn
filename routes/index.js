@@ -12,7 +12,6 @@ const eventsRoutes = require('./events');
 const announcementsRoutes = require('./announcements');
 const usersRoutes = require('./users');
 const homeRoutes = require('./home');
-const executivesRoutes = require('./executives');
 
 // Route grouping keeps each content type in its own file while exposing one
 // /api namespace to the frontend.
@@ -26,6 +25,5 @@ router.use('/events', eventsRoutes);
 router.use('/announcements', announcementsRoutes);
 router.use('/users', usersRoutes);
 router.use('/home', homeRoutes);
-router.use('/executives', executivesRoutes);
 
 module.exports = router;
