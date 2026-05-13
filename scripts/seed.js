@@ -12,8 +12,8 @@ require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
 
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'admin123'; // Change this before running!
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'; // Change this before running!
 const ADMIN_NAME = 'Administrator';
 const ADMIN_EMAIL = 'admin@acses.com';
 
