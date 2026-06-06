@@ -33,13 +33,18 @@ router.post('/login', loginLimiter, async (req, res) => {
         const db = client.db(DB_NAME);
         const user = await db.collection('users').findOne({ username });
 
-        if (!user) {
+        if (!user || !user.password || typeof user.password !== 'string') {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        if (!process.env.JWT_SECRET) {
+            console.error('POST /auth/login: missing JWT_SECRET');
+            return res.status(500).json({ error: 'Login failed' });
         }
 
         const token = jwt.sign(
@@ -52,7 +57,7 @@ router.post('/login', loginLimiter, async (req, res) => {
         const { password: _, ...safeUser } = user;
         res.json({ token, user: safeUser });
     } catch (err) {
-        console.error('POST /auth/login:', err.message);
+        console.error('POST /auth/login:', err);
         res.status(500).json({ error: 'Login failed' });
     }
 });
