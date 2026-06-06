@@ -24,10 +24,11 @@ app.use(morgan('[:date[iso]] :method :url :status :response-time[0]ms - :res[con
 app.use(compression());
 
 app.use(cors({
-  origin: [
-    process.env.CORS_ORIGIN,
-    process.env.CORS_ORIGIN_VERCEL,
-  ],
+  origin:"*",
+  //  [
+  //   process.env.CORS_ORIGIN,
+  //   process.env.CORS_ORIGIN_VERCEL,
+  // ],
   credentials: true,
 }));
 
