@@ -29,7 +29,7 @@ app.use(cors({
   //   process.env.CORS_ORIGIN,
   //   process.env.CORS_ORIGIN_VERCEL,
   // ],
-  credentials: true,
+  // credentials: true,
 }));
 
 app.use(express.json({ limit: '2mb' }));
