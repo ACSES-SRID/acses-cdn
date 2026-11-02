@@ -473,6 +473,52 @@
                     }
                 }
             },
+            "GalleryAlbum": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Bits to Bytes 2024"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://braoseistudios.picflow.com/ojf97nk5dn"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Annual tech conference photos"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "GalleryAlbumInput": {
+                "type": "object",
+                "required": [
+                    "title",
+                    "url"
+                ],
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            },
             "StudentProject": {
                 "type": "object",
                 "properties": {
@@ -1607,6 +1653,130 @@
                 "responses": {
                     "200": {
                         "description": "Deleted"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/gallery/albums": {
+            "get": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "List photo albums",
+                "description": "Returns all external photo album links (Google Drive, Picflow, etc.)",
+                "responses": {
+                    "200": {
+                        "description": "List of albums",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/GalleryAlbum"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Add photo album",
+                "description": "Add an external photo album link (e.g., Picflow, Google Drive, Flickr)",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GalleryAlbumInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Album created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GalleryAlbum"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Title and URL are required"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            }
+        },
+        "/api/gallery/albums/{id}": {
+            "put": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Update photo album",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GalleryAlbumInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Album updated"
+                    },
+                    "401": {
+                        "description": "Auth required"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Gallery"
+                ],
+                "summary": "Delete photo album",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/idParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Album deleted"
                     },
                     "401": {
                         "description": "Auth required"
